@@ -1,0 +1,133 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+:root{
+  --bg : #fff;
+  --text : #000;
+  --left : #f5f5f5;
+  --right : #fff;
+  --user1-bg : #dcf8c6;
+  --user2-bg : #eee;
+  --input-bg : #fff;
+  --border : #ddd;
+  --prime : #0b846d;
+}
+[data-theme="dark"]{
+  --bg : #121212;
+  --text : #fff;
+  --left : #1e1e1e;
+  --right : #181818;
+  --user1-bg : #056162;
+  --user2-bg : #262626;
+  --input-bg : #1f1f1f;
+  --border : #333;
+  --prime : #25d366;
+}
+.main{
+  display: flex;
+  height: 100vh;
+  background-color: var(--bg);
+  color: var(--text);
+}
+.left{
+  width: 30%;
+  background-color: var(--left);
+  border-right: 1px solid var(--border);
+}
+.right{
+  width: 70%;
+  background-color: var(--right);
+}
+
+.chat-style{
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.box{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.head{
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.messages{
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+/* right */
+/* .user1{
+  align-self: flex-end;
+  background-color: var(--user1-bg);
+  padding: 8px;
+  margin: 5px;
+  border-radius: 5px;
+  width: fit-content;
+}
+/* left */
+/* .user2{
+  align-self: flex-start;
+  background-color: var(--user2-bg);
+  padding: 8px;
+  margin: 5px;
+  border-radius: 5px;
+  width: fit-content;
+} */ 
+
+.msg-box{
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid var(--border);
+}
+.msg-box input{
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.msg-box button{
+  padding: 10px ;
+  margin-left: 5px;
+  background-color: var(--prime);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay{
+  position: fixed;
+  inset: 0;
+  background: var(--left);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal{
+  color: var(--text);
+  padding: 20px;
+  border-radius: 5px;
+  width: 300px;
+}
+.user{
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
