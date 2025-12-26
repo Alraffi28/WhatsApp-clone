@@ -5,6 +5,7 @@ import {IoSend} from 'react-icons/io5'
 
 export default function MsgBox({chat , onMessageSent}) {
     const[content , setContent] = useState("");
+    // const user = JSON.parse(localStorage.getItem("user"));
 
     const sendMessage = async ()=>{
         if(!content.trim()) return;

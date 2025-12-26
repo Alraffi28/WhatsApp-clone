@@ -19,6 +19,7 @@ export default function ChatBox({chat}) {
             }
         }
         fetchMessages()
+        socket.emit("joinChat" , chat._id)
     },[chat])
 
     useEffect(()=>{
@@ -30,17 +31,17 @@ export default function ChatBox({chat}) {
         return ()=>{socket.off("messageReceived")}
     },[chat])
 
-    useEffect(() => {
-  if (!chat) return;
+//     useEffect(() => {
+//   if (!chat) return;
 
-  socket.emit("joinChat", chat._id);
+//   socket.emit("joinChat", chat._id);
 
-}, [chat]);
+// }, [chat]);
     const handleNewMessage = (message)=>{
         setMessages((prev)=>[...prev , message])
     }
     const otherUser = chat.users.find(
-        (u)=>u._id !== user.id
+        (u)=>u._id !== (user._id || user.id)
     )
 
   return (
