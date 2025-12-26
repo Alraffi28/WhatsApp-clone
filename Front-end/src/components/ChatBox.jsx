@@ -19,16 +19,23 @@ export default function ChatBox({chat}) {
             }
         }
         fetchMessages()
-        socket.emit("joinChat" , chat._id)
-    },[chat])
+        if (socket.connected) {
+            socket.emit("joinChat", chat._id);
+        }  else {
+            socket.on("connect", () => {
+             socket.emit("joinChat", chat._id);
+        });
+  }
+},[chat])
 
     useEffect(()=>{
-        socket.on("messageReceived" , (newMessage)=>{
-            if(newMessage.chat._id === chat._id){
-                setMessages((prev)=>[...prev , newMessage])
+        const hdlMessageReceive = (newMessage) =>{
+            if (newMessage.chat._id === chat?._id) {
+            setMessages((prev) => [...prev, newMessage]);
             }
-        })
-        return ()=>{socket.off("messageReceived")}
+        }
+        socket.on("messageReceived" , hdlMessageReceive)
+        return ()=>{socket.off("messageReceived" , hdlMessageReceive)}
     },[chat])
 
 //     useEffect(() => {
