@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://whatsapp-clone-uh55.onrender.com"
+  baseURL: "https://whatsapp-clone-uh55.onrender.com/wp"
 });
 
 API.interceptors.request.use((req) => {
