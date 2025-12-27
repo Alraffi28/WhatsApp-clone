@@ -3,6 +3,10 @@ import {Link, useNavigate} from "react-router-dom"
 import axios from "axios"
 import API from "../services/api";
 import { useEffect } from "react";
+import { FaLock } from "react-icons/fa";
+import { IoIosMail } from "react-icons/io";
+import { MdError } from "react-icons/md";
+import '../login.css'
 
 export default function Login(){
     const [email , setEmail] = useState('');
@@ -30,18 +34,30 @@ export default function Login(){
         setEmail("")
         setPassword("")
     },[])
+    
     return(
         <>
-        <div>
+        <div className="login">
             <form action="" onSubmit={handleLogin}>
-                <h2>LOGIN</h2>
-                <input type="email" value={email} name="email" onChange={(e)=>setEmail(e.target.value)} placeholder=" Enter your mail" autoComplete='off' required />
-                <input type="password" value={password} name="password" onChange={(e)=>setPassword(e.target.value)} placeholder=" Enter your password" autoComplete='off' required/>
+                <h1>LOGIN</h1>
+                <div className="input-box">
+                    <input type="email" value={email} name="email" onChange={(e)=>setEmail(e.target.value)} placeholder=" Enter your mail" autoComplete='off' required />
+                    <span><IoIosMail size={25}/></span>
+                </div>
+                <div className="input-box">
+                    <input type="password" value={password} name="password" onChange={(e)=>setPassword(e.target.value)} placeholder=" Enter your password" autoComplete='off' required/>
+                    <span><FaLock size={20}/></span>
+                </div>
                 {
-                    error && (<p>{error}</p>)
+                    error && (<div className="error-msg">
+                                <p><MdError size={20}/></p>
+                                <p>{error}</p>
+                            </div>)
                 }
                 <button type="submit">Login</button>
-                <p>Don't have an account ? <Link to='/register'>Sign up</Link></p>
+                <div className="link">
+                    <p>Don't have an account ? <Link to='/register'>Sign up</Link></p>
+                </div>
             </form>
         </div>
         </>
