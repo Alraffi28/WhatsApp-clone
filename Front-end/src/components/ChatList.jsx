@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import API from '../services/api';
 import NewChat from './NewChat';
+import socket from '../socket/socket';
 
 export default function ChatList({setSelectedChat,openNewChat,showNewChat,closeNewChat}) {
     const [chats , setChats] = useState([]);
@@ -17,6 +18,37 @@ export default function ChatList({setSelectedChat,openNewChat,showNewChat,closeN
         }
         fetchChat()
     }, [])
+
+    useEffect(() => {
+  socket.on("messageReceived", (newMessage) => {
+    setChats((prev) => {
+      // find the chat that received new message
+      const chatToUpdate = prev.find(
+        (c) => c._id === newMessage.chat._id
+      );
+
+      // if chat not found, do nothing
+      if (!chatToUpdate) return prev;
+
+      // update latestMessage
+      const updatedChat = {
+        ...chatToUpdate,
+        latestMessage: newMessage,
+      };
+
+      // remove old chat
+      const remainingChats = prev.filter(
+        (c) => c._id !== newMessage.chat._id
+      );
+
+      // move updated chat to top
+      return [updatedChat, ...remainingChats];
+    });
+  });
+
+  return () => socket.off("messageReceived");
+}, []);
+
   return (
    <>
    <div className='chat-list'>
