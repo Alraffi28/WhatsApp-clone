@@ -1,17 +1,35 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
+import { BsSunFill, BsMoonFill } from "react-icons/bs";
+import "./Toggle.css";
 
 export default function Toggle() {
-    const[theme , setTheme] = useState(localStorage.getItem("theme" || "light"))
+  const [dark, setDark] = useState(false);
 
-    useEffect(()=>{
-        document.body.setAttribute("data-theme" , theme)
-        localStorage.setItem("theme" , theme)
-    },[theme])
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      setDark(true);
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    setDark((prev) => {
+      const newTheme = !prev;
+      document.documentElement.setAttribute(
+        "data-theme",
+        newTheme ? "dark" : "light"
+      );
+      localStorage.setItem("theme", newTheme ? "dark" : "light");
+      return newTheme;
+    });
+  };
+
   return (
-    <>
-    <button onClick={()=>setTheme(theme==="light" ? "dark" : "light")} style={{backgroundColor:"var(--right)",color:"var(--text)" , border:"none"}}>
-        {theme === "light" ? <i class="fa-solid fa-sun"></i> :  <i class="fa-regular fa-moon"></i>}
-        </button>
-    </>
-  ) 
+    <div className="theme-toggle" onClick={toggleTheme}>
+      <BsSunFill className="icon sun" />
+      <BsMoonFill className="icon moon" />
+      <div className={`toggle-circle ${dark ? "dark" : ""}`} />
+    </div>
+  );
 }

@@ -55,7 +55,7 @@ export default function ChatBox({chat}) {
     <>
     <div className="box">
         <div className="head">
-            <h4>{otherUser?.username}</h4>
+            <h3>{otherUser?.username}</h3>
             <Toggle/>
         </div>
 
@@ -63,34 +63,25 @@ export default function ChatBox({chat}) {
             {messages.map((msg)=>{
                 const isMessage = msg.sender._id===user._id || msg.sender._id === user.id
                 return(
-                    <div key={msg._id} style={isMessage ? styles.user1 : styles.user2}>
-                        {msg.content}
+                    <div key={msg._id} className={`message ${isMessage ? "user1" : "user2"}`}>
+                        <span className="msg-text">{msg.content}</span>
+                        <span className="msg-time">
+                            {new Date(msg.createdAt).toLocaleTimeString([],{
+                                hour:"2-digit",
+                                minute :"2-digit"
+                            })}
+                        </span>
                     </div>
                 )
             })}
             {/* <div className="user1">Hii</div>
             <div className="user2">Hello</div> */}
         </div>
-        <MsgBox chat={chat} onMessageSent={handleNewMessage}/>
+        <div className="chat-input">
+            <MsgBox chat={chat} onMessageSent={handleNewMessage}/>
+        </div>
     </div>
     </>
   )
 }
-const styles = {
-    user1 : {
-        alignSelf : "flex-end",
-        background : "var(--user1-bg)",
-        padding: "8px",
-        margin: "5px",
-        borderRadius: "5px",
-        width: "fit-content",
-    },
-    user2 : {
-        alignSelf: "flex-start",
-        background: "var(--user2-bg)",
-        padding: "8px",
-        margin: "5px",
-        borderRadius: "5px",
-        width: "fit-content",
-    }
-}
+

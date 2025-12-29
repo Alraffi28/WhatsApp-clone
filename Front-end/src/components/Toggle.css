@@ -1,0 +1,34 @@
+.theme-toggle {
+  width: 65px;
+  height: 32px;
+  background: var(--border);
+  border-radius: 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.theme-toggle .icon {
+  font-size: 14px;
+  z-index: 2;
+  transition: color 0.3s ease;
+}
+.theme-toggle .moon {
+  color: #adb5bd;
+}
+.toggle-circle {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  background: white;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.3s ease;
+}
+.toggle-circle.dark {
+  transform: translateX(33px);
+}

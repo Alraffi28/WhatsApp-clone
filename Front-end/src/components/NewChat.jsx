@@ -19,6 +19,7 @@ export default function NewChat({close , addChat}) {
         try {
             const res = await API.post("/chat" , {userId})
             addChat(res.data)
+            close()
         } catch (error) {
             console.log("error creating chat" , error);
         }
@@ -27,11 +28,15 @@ export default function NewChat({close , addChat}) {
     <>
     <div className="overlay">
         <div className="modal">
-            <h3>Start New Chat</h3>
+            <h2>Start New Chat</h2>
+            <br />
             {users.map((user)=>(
-                <div className="user" key={user._id} onClick={()=>startChat(user._id)}>{user.username}</div>
+                <div className="user" key={user._id}>
+                    <p>{user.username}</p><button onClick={()=>startChat(user._id)} className='add-btn'>Add</button>
+                    </div>
             ))}
-            <button onClick={close}>Close</button>
+            <br />
+            <button onClick={close} className='new-btn'>Close</button>
         </div>
     </div>
     </>
