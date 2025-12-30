@@ -44,6 +44,14 @@ export default function ChatList({setSelectedChat,openNewChat,showNewChat,closeN
   return () => socket.off("messageReceived");
 }, []);
 
+const formatTime = (date)=>{
+  if(!date) return "";
+  return new Date(date).toLocaleTimeString([],{
+    hour : "2-digit",
+    minute : "2-digit"
+  })
+}
+
   return (
    <>
    <div className='chat-list'>
@@ -67,8 +75,9 @@ export default function ChatList({setSelectedChat,openNewChat,showNewChat,closeN
                 <div key={chat._id} className='chat-item' onClick={()=>setSelectedChat(chat)}>
                     <strong className='chat-avatar'>{avatarLetter}</strong>
                     <div className="chat-info">
-                        <div className="chat-name">
-                            {chatName}
+                        <div className="chat-top">
+                           <span className='chat-name'>{chatName}</span>
+                           <span className="chat-time">{formatTime(chat.latestMessage?.createdAt)}</span>
                         </div>
                         <div className="chat-last">
                             {chat.latestMessage?.content || "No message yet"}

@@ -228,7 +228,9 @@
 .chat-item {
   display: flex;
   align-items: center;
+  margin-left: 10px;
   padding: 10px;
+  gap: 20px;
   cursor: pointer;
   border-bottom: 1px solid #f0f0f0;
   transition: background 0.2s;
@@ -236,12 +238,9 @@
 .chat-item:hover {
   background: var(--hover);
 }
-.chat-item.active {
-  background: #e9edef;
-}
 .chat-avatar {
-  width: 45px;
-  height: 45px;
+  width: 50px;
+  height: 50px;
   background: #dfe5e7;
   border-radius: 50%;
   display: flex;
@@ -250,19 +249,32 @@
   font-weight: bold;
   color: var(--prime);
   margin-right: 10px;
-  font-size: 18px;
+  font-size: 24px;
 }
 .chat-info {
   flex: 1;
   overflow: hidden;
 }
+.chat-top{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 .chat-name {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 18px;
   color: var(--text);
 }
+.chat-time{
+  font-size: 15px;
+  color: var(--empty);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .chat-last {
-  font-size: 13px;
+  font-size: 15px;
+  padding-top: 5px;
   color: var(--empty);
   white-space: nowrap;
   overflow: hidden;
@@ -293,7 +305,7 @@
   }
   .left , .right{
     width: 100%;
-    height: 100vh;
+    height: 95vh;
   }
   .back-btn {
     display: inline-block;
@@ -304,6 +316,7 @@
     cursor: pointer;
     color: var(--text);
   }
+
   .modal{
     width: 60%;
   }
