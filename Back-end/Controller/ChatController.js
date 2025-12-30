@@ -45,4 +45,33 @@ const fetchChat = async (req , res) =>{
         res.status(500).json({message : "Error fetching chat"})
     }
 }
-module.exports = {accessChat , fetchChat}
+// GROUP
+const createGroupChat = async (req, res) => {
+  const { users, chatName } = req.body;
+
+  if (!users || users.length < 2) {
+    return res.status(400).json({
+      message: "Group must have at least 3 users",
+    });
+  }
+
+  users.push(req.user.id); // add creator
+
+  try {
+    const groupChat = await Chat.create({
+      chatName,
+      users,
+      isGroupChat: true,
+      groupAdmin: req.user.id,
+    });
+
+    const fullGroupChat = await Chat.findById(groupChat._id)
+      .populate("users", "username email")
+      .populate("groupAdmin", "username email");
+
+    res.status(200).json(fullGroupChat);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to create group" });
+  }
+}
+module.exports = {accessChat , fetchChat , createGroupChat}

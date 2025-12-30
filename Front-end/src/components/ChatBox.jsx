@@ -1,12 +1,18 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState ,useRef } from 'react'
 import MsgBox from './MsgBox'
 import Toggle from './Toggle'
 import API from '../services/api';
 import socket from '../socket/socket';
+import { IoIosArrowBack } from "react-icons/io";
 
-export default function ChatBox({chat}) {
+export default function ChatBox({chat , goBack}) {
     const[messages , setMessages] = useState([]);
     const user = JSON.parse(localStorage.getItem("user"))
+
+    const bottomRef = useRef(null)
+    useEffect(()=>{
+        bottomRef.current?.scrollIntoView({behavior : "smooth"})
+    },[messages])
 
     useEffect(()=>{
         if(!chat)return
@@ -47,15 +53,24 @@ export default function ChatBox({chat}) {
     const handleNewMessage = (message)=>{
         setMessages((prev)=>[...prev , message])
     }
-    const otherUser = chat.users.find(
+
+    const otherUser = !chat.isGroupChat
+    ? chat.users.find(
         (u)=>u._id !== (user._id || user.id)
     )
+    : null;
+    const chatTitle = chat.isGroupChat
+    ? chat.chatName
+    : otherUser?.username;
 
   return (
     <>
     <div className="box">
         <div className="head">
-            <h3>{otherUser?.username}</h3>
+            {goBack && (
+                <button className='back-btn' onClick={goBack}><IoIosArrowBack size={20}/></button>
+            )}
+            <h3>{chatTitle}</h3>
             <Toggle/>
         </div>
 
@@ -74,9 +89,11 @@ export default function ChatBox({chat}) {
                     </div>
                 )
             })}
+            <div ref={bottomRef}></div>
             {/* <div className="user1">Hii</div>
             <div className="user2">Hello</div> */}
         </div>
+        
         <div className="chat-input">
             <MsgBox chat={chat} onMessageSent={handleNewMessage}/>
         </div>

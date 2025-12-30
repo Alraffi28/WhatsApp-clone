@@ -22,25 +22,20 @@ export default function ChatList({setSelectedChat,openNewChat,showNewChat,closeN
     useEffect(() => {
   socket.on("messageReceived", (newMessage) => {
     setChats((prev) => {
-      // find the chat that received new message
+      // find 
       const chatToUpdate = prev.find(
         (c) => c._id === newMessage.chat._id
       );
-
-      // if chat not found, do nothing
       if (!chatToUpdate) return prev;
-
       // update latestMessage
       const updatedChat = {
         ...chatToUpdate,
         latestMessage: newMessage,
       };
-
       // remove old chat
       const remainingChats = prev.filter(
         (c) => c._id !== newMessage.chat._id
       );
-
       // move updated chat to top
       return [updatedChat, ...remainingChats];
     });
@@ -55,16 +50,25 @@ export default function ChatList({setSelectedChat,openNewChat,showNewChat,closeN
     <h3 style={{padding:"10px"}}>CHATS</h3>
     {!showNewChat &&
         chats.map((chat)=>{
-            const otherUser = chat.users.find(
+          const isGroupChat = chat.isGroupChat;
+            const otherUser = !isGroupChat
+            ? chat.users.find(
                 (u)=>u._id !== (user._id || user.id)
             )
-            if(!otherUser) return null
+            : null;
+
+            const chatName = isGroupChat
+            ? chat.chatName : otherUser?.username;
+            const avatarLetter = isGroupChat
+            ? chat.chatName.charAt(0).toUpperCase()
+            : otherUser?.username.charAt(0).toUpperCase()
+            if(!isGroupChat && !otherUser) return null
             return(
                 <div key={chat._id} className='chat-item' onClick={()=>setSelectedChat(chat)}>
-                    <strong className='chat-avatar'>{otherUser.username.charAt(0).toUpperCase()}</strong>
+                    <strong className='chat-avatar'>{avatarLetter}</strong>
                     <div className="chat-info">
                         <div className="chat-name">
-                            {otherUser.username}
+                            {chatName}
                         </div>
                         <div className="chat-last">
                             {chat.latestMessage?.content || "No message yet"}
