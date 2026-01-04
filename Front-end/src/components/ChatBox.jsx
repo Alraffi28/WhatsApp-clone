@@ -50,6 +50,17 @@ export default function ChatBox({chat , goBack}) {
 //   socket.emit("joinChat", chat._id);
 
 // }, [chat]);
+
+    const hdlDelete = async (messageId) =>{
+        try {
+            await API.delete(`/message/delete/${messageId}`)
+            setMessages((prev)=>{
+                prev.filter((m)=>m._id !== messageId)
+            })
+        } catch (error) {
+            console.log("Delete failed" , error)
+        }
+    }
     const handleNewMessage = (message)=>{
         setMessages((prev)=>[...prev , message])
     }
@@ -78,7 +89,15 @@ export default function ChatBox({chat , goBack}) {
             {messages.map((msg)=>{
                 const isMessage = msg.sender._id===user._id || msg.sender._id === user.id
                 return(
-                    <div key={msg._id} className={`message ${isMessage ? "user1" : "user2"}`}>
+                    <div key={msg._id} className={`message ${isMessage ? "user1" : "user2"}`}
+                        onContextMenu={(e)=>{
+                            e.preventDefault()
+                            hdlDelete(msg._id)
+                        }}
+                    >
+                        {chat.isGroupChat && !isMessage && (
+                            <div className="sender-name">{msg.sender.username}</div>
+                        )}
                         <span className="msg-text">{msg.content}</span>
                         <span className="msg-time">
                             {new Date(msg.createdAt).toLocaleTimeString([],{

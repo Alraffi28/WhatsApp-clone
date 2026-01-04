@@ -17,6 +17,7 @@
   --empty : #777;
   --hover : #bcbcbc;
   --small : #0b846d;
+  --name : #1f7aec;
 }
 [data-theme="dark"]{
   --bg : #121212;
@@ -31,6 +32,7 @@
   --empty : #999;
   --hover : #434343;
   --small : #25d366;
+  --name : #4fc3f7;
 }
 .main{
   display: flex;
@@ -129,7 +131,13 @@
   margin-right: auto;
   border-top-left-radius: 0;
   width: fit-content;
-} 
+}
+.sender-name{
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  color: var(--name);
+}
 .msg-box{padding-bottom: env(safe-area-inset-bottom);}
 .msg-box{
   display: flex;

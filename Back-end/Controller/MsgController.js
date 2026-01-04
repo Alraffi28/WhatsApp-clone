@@ -26,7 +26,7 @@ const sendMessage = async(req , res) => {
 const getMessage = async (req , res) => {
     try{
         const {chatId} = req.params
-        const messages = await Message.find({chat : chatId})
+        const messages = await Message.find({chat : chatId , deletedFor:{$ne : req.user.id}})
         .populate("sender" , "username email")
         .populate("chat")
         .sort({createdAt : 1})
@@ -36,4 +36,17 @@ const getMessage = async (req , res) => {
         res.status(500).json({message : "Error receiving message"})
     }
 }
-module.exports = {sendMessage , getMessage}
+// DELETE
+const deleteMessage = async (req , res) => {
+    const {messageId} = req.params;
+    const userId = req.user.id
+    try {
+        await Message.findByIdAndUpdate(messageId , {
+            $addToSet : {deletedFor : userId}
+        })
+        res.json({message : "Deleted for you"})
+    } catch (error) {
+        res.status(500).json({message : "Failed to delete" , error})
+    }
+}
+module.exports = {sendMessage , getMessage ,deleteMessage}

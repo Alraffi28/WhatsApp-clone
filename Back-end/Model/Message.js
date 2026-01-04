@@ -11,6 +11,10 @@ const msgSchema = new mongoose.Schema(
             trim : true,
             required : true
         },
+        deletedFor : [{
+            type : mongoose.Schema.Types.ObjectId,
+            ref : "User"
+        }],
         chat : {
             type : mongoose.Schema.Types.ObjectId,
             ref : "Chat",
