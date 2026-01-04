@@ -9,11 +9,25 @@ export default function ChatBox({chat , goBack}) {
     const[messages , setMessages] = useState([]);
     const [menuMsgId , setMenuMsgId] = useState(null)
     const user = JSON.parse(localStorage.getItem("user"))
-
     const bottomRef = useRef(null)
+    const longPress = useRef(null)
+
     useEffect(()=>{
         bottomRef.current?.scrollIntoView({behavior : "smooth"})
     },[messages])
+
+    // mobile long press
+    function StartLongPress(msgId){
+        longPress.current = setTimeout(()=>{
+            setMenuMsgId(msgId)
+        },500)
+    }
+    function cancelLongPress(){
+        if(longPress.current){
+            clearTimeout(longPress.current)
+            longPress.current = null
+        }
+    }
 
     useEffect(()=>{
         if(!chat)return
@@ -41,35 +55,40 @@ export default function ChatBox({chat , goBack}) {
             setMessages((prev) => [...prev, newMessage]);
             }
         }
+
+        const hdlDeleteEveryone = (updatedMessage) => {
+            setMessages((prev)=>prev.map((m)=>m._id===updatedMessage._id?updatedMessage:m))
+        }
+
         socket.on("messageReceived" , hdlMessageReceive)
-        socket.on("messageDeleted" , (messageId)=>{
-            setMessages((prev) =>prev.map((m)=>
-                m._id === messageId 
-                ? { ...m , content : "This message was deleted" , deleted : true}
-                : m
-            ))
-        })
+        socket.on("messageDeleted" , hdlDeleteEveryone)
         return ()=>{socket.off("messageReceived" , hdlMessageReceive)
-                    socket.off("messageDeleted")
+                    socket.off("messageDeleted" , hdlDeleteEveryone)
         }
     },[chat])
+
+    useEffect(()=>{
+        const closeMenu = () => setMenuMsgId(null)
+        document.addEventListener("click" ,closeMenu)
+        return () => document.removeEventListener("click" , closeMenu)
+    },[])
 
     const hdlDelete = async (messageId) =>{
         try {
             await API.delete(`/message/delete/${messageId}`);
-            setMessages((prev) =>
-            Array.isArray(prev)
-                ? prev.filter((m) => m._id !== messageId)
-                : []
-            )
+            setMessages((prev) => prev.filter((m) => m._id !== messageId));
+            setMenuMsgId(null);
         } catch (error) {
             console.log("Delete failed" , error)
         }
     }
     const hdlDeleteAll = async (messageId) => {
         try {
-            await API.put(`/message/delete-everyone/${messageId}`);
-            socket.emit("deleteMessageEveryone" , messageId)
+            const { data } = await API.put(`/message/delete-everyone/${messageId}`)
+            setMessages((prev)=>
+                prev.map((m)=>(m._id===data._id ? data : m))
+            )
+            socket.emit("deleteMessageEveryone" , {messageId})
             setMenuMsgId(null)
             } catch (error) {
                 console.log("Delete for everyone failed");
@@ -102,20 +121,23 @@ export default function ChatBox({chat , goBack}) {
         </div>
 
         <div className="messages">
-            {Array.isArray(messages) && messages.map((msg)=>{
+            {messages.map((msg)=>{
                 const isMessage = msg.sender._id===user._id || msg.sender._id === user.id
                 return(
                     <div key={msg._id} className={`message ${isMessage ? "user1" : "user2"}`}
-                        onClick={()=>setMenuMsgId(null)}
                         onContextMenu={(e)=>{
                             e.preventDefault()
+                            e.stopPropagation()
                             setMenuMsgId(msg._id)
                         }}
+                        onTouchStart={()=>StartLongPress(msg._id)} onTouchEnd={cancelLongPress} onTouchMove={cancelLongPress}
                     >
                         {chat.isGroupChat && !isMessage && (
                             <div className="sender-name">{msg.sender.username}</div>
                         )}
-                        <span className="msg-text">{msg.content}</span>
+                        <span className="msg-text">{msg.isDeleted ? (
+                            <em style={{color : "var(--empty)"}}>This message was deleted</em>
+                        ) :( msg.content)}</span>
                         <span className="msg-time">
                             {new Date(msg.createdAt).toLocaleTimeString([],{
                                 hour:"2-digit",
@@ -124,10 +146,10 @@ export default function ChatBox({chat , goBack}) {
                         </span>
                         {/* delete */}
                         {menuMsgId === msg._id && (
-                            <div className="msg-menu">
+                            <div className={`msg-popup ${isMessage ? "right" : "left"}`}>
                                 <button  onClick={()=>hdlDelete(msg._id)}>Delete for me</button>
-                            {isMine && !msg.deleted && (
-                                <button onClick={()=>hdlDeleteAll(msg._id)}>Delete for everyone</button>
+                            {isMessage && !msg.deleted && (
+                                <button onClick={()=>hdlDeleteAll(msg._id)} className='danger'>Delete for everyone</button>
                             )}
                             </div>
                         )}
