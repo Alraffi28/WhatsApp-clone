@@ -49,4 +49,35 @@ const deleteMessage = async (req , res) => {
         res.status(500).json({message : "Failed to delete" , error})
     }
 }
-module.exports = {sendMessage , getMessage ,deleteMessage}
+// DELETE FOR ALL
+const deleteForAll = async (req , res) =>{
+    const {messageId} = req.params
+    try {
+        const message = await Message.findById(messageId);
+
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+
+    if (message.sender.toString() !== req.user.id) {
+      return res
+        .status(403)
+        .json({ message: "Not allowed to delete this message" });
+    }
+
+    message.isDeleted = true;
+    message.content = "This message was deleted";
+    message.deletedFor = []; // visible to all
+
+    await message.save();
+
+    const populatedMessage = await Message.findById(messageId)
+      .populate("sender", "username email")
+      .populate("chat");
+
+    res.json(populatedMessage)
+    } catch (error) {
+        res.status(500).json({ message: "Delete failed" });
+    }
+}
+module.exports = {sendMessage , getMessage ,deleteMessage , deleteForAll}

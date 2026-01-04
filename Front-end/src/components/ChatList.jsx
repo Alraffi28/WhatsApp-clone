@@ -77,7 +77,9 @@ const formatTime = (date)=>{
                     <div className="chat-info">
                         <div className="chat-top">
                            <span className='chat-name'>{chatName}</span>
-                           <span className="chat-time">{formatTime(chat.latestMessage?.createdAt)}</span>
+                           <span className="chat-time">{ chat.latestMessage ?
+                            formatTime(chat.latestMessage.createdAt)
+                            : ""}</span>
                         </div>
                         <div className="chat-last">
                             {chat.latestMessage?.content || "No message yet"}

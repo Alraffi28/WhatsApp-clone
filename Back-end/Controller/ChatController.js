@@ -32,13 +32,22 @@ const accessChat = async (req , res) =>{
 // FETCH
 const fetchChat = async (req , res) =>{
     try {
-        const chats = await Chat.find({
+        let chats = await Chat.find({
             users : {$in : [req.user.id]} //to find all chats where I exist
         })
         .populate("users" , "-password")
         .populate("groupAdmin" , "-password")
         .populate("latestMessage")
         .sort({updatedAt : -1})
+        chats = chats.map((chat)=>{
+          if(
+            chat.latestMessage &&
+            chat.latestMessage.deletedFor?.includes(req.user.id)
+          ){
+            chat.latestMessage = null
+          }
+          return chat
+        })
         res.status(200).json(chats)
     } catch (err) {
         console.log(err);

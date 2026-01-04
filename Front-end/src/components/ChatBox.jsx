@@ -7,6 +7,7 @@ import { IoIosArrowBack } from "react-icons/io";
 
 export default function ChatBox({chat , goBack}) {
     const[messages , setMessages] = useState([]);
+    const [menuMsgId , setMenuMsgId] = useState(null)
     const user = JSON.parse(localStorage.getItem("user"))
 
     const bottomRef = useRef(null)
@@ -41,26 +42,41 @@ export default function ChatBox({chat , goBack}) {
             }
         }
         socket.on("messageReceived" , hdlMessageReceive)
-        return ()=>{socket.off("messageReceived" , hdlMessageReceive)}
+        socket.on("messageDeleted" , (messageId)=>{
+            setMessages((prev) =>prev.map((m)=>
+                m._id === messageId 
+                ? { ...m , content : "This message was deleted" , deleted : true}
+                : m
+            ))
+        })
+        return ()=>{socket.off("messageReceived" , hdlMessageReceive)
+                    socket.off("messageDeleted")
+        }
     },[chat])
-
-//     useEffect(() => {
-//   if (!chat) return;
-
-//   socket.emit("joinChat", chat._id);
-
-// }, [chat]);
 
     const hdlDelete = async (messageId) =>{
         try {
-            await API.delete(`/message/delete/${messageId}`)
-            setMessages((prev)=>{
-                prev.filter((m)=>m._id !== messageId)
-            })
+            await API.delete(`/message/delete/${messageId}`);
+            setMessages((prev) =>
+            Array.isArray(prev)
+                ? prev.filter((m) => m._id !== messageId)
+                : []
+            )
         } catch (error) {
             console.log("Delete failed" , error)
         }
     }
+    const hdlDeleteAll = async (messageId) => {
+        try {
+            await API.put(`/message/delete-everyone/${messageId}`);
+            socket.emit("deleteMessageEveryone" , messageId)
+            setMenuMsgId(null)
+            } catch (error) {
+                console.log("Delete for everyone failed");
+            }
+        };
+        if(!chat) return null;
+
     const handleNewMessage = (message)=>{
         setMessages((prev)=>[...prev , message])
     }
@@ -86,13 +102,14 @@ export default function ChatBox({chat , goBack}) {
         </div>
 
         <div className="messages">
-            {messages.map((msg)=>{
+            {Array.isArray(messages) && messages.map((msg)=>{
                 const isMessage = msg.sender._id===user._id || msg.sender._id === user.id
                 return(
                     <div key={msg._id} className={`message ${isMessage ? "user1" : "user2"}`}
+                        onClick={()=>setMenuMsgId(null)}
                         onContextMenu={(e)=>{
                             e.preventDefault()
-                            hdlDelete(msg._id)
+                            setMenuMsgId(msg._id)
                         }}
                     >
                         {chat.isGroupChat && !isMessage && (
@@ -105,6 +122,15 @@ export default function ChatBox({chat , goBack}) {
                                 minute :"2-digit"
                             })}
                         </span>
+                        {/* delete */}
+                        {menuMsgId === msg._id && (
+                            <div className="msg-menu">
+                                <button  onClick={()=>hdlDelete(msg._id)}>Delete for me</button>
+                            {isMine && !msg.deleted && (
+                                <button onClick={()=>hdlDeleteAll(msg._id)}>Delete for everyone</button>
+                            )}
+                            </div>
+                        )}
                     </div>
                 )
             })}
