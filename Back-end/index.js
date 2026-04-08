@@ -14,7 +14,13 @@ require('dotenv').config()
 
 const app = express();
 
-app.use(cors())
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://whats-app-clone-theta-eight.vercel.app"
+  ],
+  credentials: true
+}))
 app.use(express.json())
 connectDB()
 
@@ -27,12 +33,12 @@ const io = new Server(server , {
     cors : {
         origin : [
             "http://localhost:5173",
-            "https://whats-app-clone-theta-eight.vercel.app/"
+            "https://whats-app-clone-theta-eight.vercel.app"
         ],
         methods : ["GET" , "POST"],
         credentials : true
     },
-    transports : ["websocket" , "polling"]
+    // transports : ["websocket" , "polling"]
 })
 socketHandle(io)
 const PORT = process.env.PORT || 5000
